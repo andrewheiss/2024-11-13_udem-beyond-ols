@@ -18,6 +18,9 @@ author:
   url: https://www.andrewheiss.com
   email: aheiss@gsu.edu
 date: "November 13, 2024"
+toc: true
+---
+
 ---
 
 ::: {.small}
@@ -30,13 +33,27 @@ Workshop presented at the Département de science politique at the Université d
 
 ## Materials
 
-All the materials we'll use today are in this RStudio project. You can open this project in your browser without needing to install or download anything on your computer. Open this [Posit.cloud](https://posit.cloud) project (you'll need to create a free account really quick):
+All the materials we'll use today are in [a self-contained RStudio project](https://github.com/andrewheiss/2024-11-13_udem-beyond-ols) that you can download to your computer. It is a `.zip` file, so make sure you extract/unzip it after downloading it (especially if [you're using Windows!](https://evalsp24.classes.andrewheiss.com/resource/unzipping.html))
+
+<p class="text-center"><a class="btn btn-info btn-lg" target="_blank" href="https://github.com/andrewheiss/2024-11-13_udem-beyond-ols/archive/refs/heads/main.zip">{{< fa file-zipper >}} &ensp;RStudio project</a></p>
+
+Alternatively, you can open this project in your browser without needing to install or download anything on your computer. HOWEVER, the Posit server isn't powerful enough to run the Bayesian models—it will crash unless you increase the amount of RAM or CPUs on the server. Open this [Posit.cloud](https://posit.cloud) project (you'll need to create a free account really quick):
 
 <p class="text-center"><a class="btn btn-info btn-lg" target="_blank" href="https://posit.cloud/content/9240648">{{< fa brands r-project >}} &ensp;Posit.cloud project</a></p>
 
-Alternatively, you can download all the files to your computer. It is a `.zip` file, so make sure you extract/unzip it after downloading it (especially if [you're using Windows!](https://evalsp24.classes.andrewheiss.com/resource/unzipping.html))
+## Packages
 
-<p class="text-center"><a class="btn btn-info btn-lg" target="_blank" href="udem-workshop.zip">{{< fa file-zipper >}} &ensp;RStudio project</a></p>
+You'll need all these packages on your computer:
+
+```r
+install.packages(
+  c("tidyverse", "marginaleffects", "brms", "tidybayes", "ggdist", "tinytable", 
+    "patchwork", "scales", "ggridges", "ragg", "knitr", "rmarkdown", "glue", 
+    "here", "extraDistr", "betareg", "parameters", "broom", "distributional", 
+    "palmerpenguins", "bayesrules", "countrycode", "WDI"
+  )
+)
+```
 
 ## Plan for today
 
