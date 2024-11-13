@@ -1,0 +1,53 @@
+---
+title: "Go beyond OLS!"
+subtitle: "An introduction to Poisson, Beta, and zero-inflated Beta Bayesian distributional regression"
+description: |
+  While ordinary least squares (OLS) regression is an important method for modeling relationships, it’s not always well-suited for outcome variables that are proportions (bounded between 0–100%) and counts (limited to whole numbers). In this workshop, you’ll learn how to use Bayesian regression techniques to get richer and more detailed information from more specialized types of data. Using R, Stan, {brms}, and {marginaleffects} you’ll learn how to (1) correctly model counts and proportions and (2) process, plot, interpret, and communicate the results.
+author:
+- name: Andrew Heiss
+  affiliations: 
+    - id: gsu
+      name: Georgia State University
+      department: Andrew Young School of Policy Studies, Department of Public Management and Policy
+      address: "55 Park Place NE, #464"
+      city: Atlanta
+      region: GA
+      country: USA
+      postal-code: 30303
+  orcid: 0000-0002-3948-3914
+  url: https://www.andrewheiss.com
+  email: aheiss@gsu.edu
+date: "November 13, 2024"
+---
+
+::: {.small}
+
+Workshop presented at the Département de science politique at the Université de Montréal
+
+:::
+
+\ 
+
+## Materials
+
+All the materials we'll use today are in this RStudio project. You can open this project in your browser without needing to install or download anything on your computer. Open this [Posit.cloud](https://posit.cloud) project (you'll need to create a free account really quick):
+
+<p class="text-center"><a class="btn btn-info btn-lg" target="_blank" href="https://posit.cloud/content/9240648">{{< fa brands r-project >}} &ensp;Posit.cloud project</a></p>
+
+Alternatively, you can download all the files to your computer. It is a `.zip` file, so make sure you extract/unzip it after downloading it (especially if [you're using Windows!](https://evalsp24.classes.andrewheiss.com/resource/unzipping.html))
+
+<p class="text-center"><a class="btn btn-info btn-lg" target="_blank" href="udem-workshop.zip">{{< fa file-zipper >}} &ensp;RStudio project</a></p>
+
+## Plan for today
+
+This is a hands-on workshop. There are no slides and we'll do minimal formal stats or math. Instead, we'll work through several Quarto documents and do a bunch of live-coding together.
+
+Here's what we'll do:
+
+- [Distributions](distributions.qmd)
+- [OLS as distributional regression](regression-normal.qmd)
+- [Poisson regression](regression-poisson.qmd)
+- [Beta regression](regression-beta.qmd)
+- [Zero/one-inflated Beta regression](regression-zoib.qmd)
+
+You can access all these using the top navigation bar too. I've also [included a page with links to other resources and examples](resources.qmd).

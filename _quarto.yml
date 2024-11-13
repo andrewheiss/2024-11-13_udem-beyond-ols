@@ -1,0 +1,49 @@
+project:
+  type: website
+  render:
+    - "*.qmd"
+    - "!README.md"
+    - "!LICENSE.md"
+  resources:
+    - "examples.zip"
+
+date-format: long
+
+website:
+  title: "Go beyond OLS!"
+  search: false
+  navbar:
+    background: "#EC292A"
+    pinned: true
+    left:
+      - href: index.qmd
+        text: Home
+      - distributions.qmd
+      - text: "Examples"
+        menu:
+          - regression-normal.qmd
+          - regression-poisson.qmd
+          - regression-beta.qmd
+          - regression-zoib.qmd
+      - resources.qmd
+    right:
+      - icon: github
+        href: "https://github.com/andrewheiss/2024-11-13_udem-beyond-ols"
+        aria-label: GitHub
+
+  page-footer:
+    left: |
+      Content {{< fa brands creative-commons >}} 2024 by [Andrew Heiss](https://www.andrewheiss.com/)<br>
+      All content licensed under a {{< fa brands creative-commons >}}
+      {{< fa brands creative-commons-by >}} {{< fa brands creative-commons-nc >}}
+      [Creative Commons Attribution-NonCommercial 4.0 International license (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/)
+    right: |
+      Made with {{< fa brands r-project >}} and [Quarto](https://quarto.org/)<br>
+      [View the source at {{< fa brands github >}} GitHub](https://github.com/andrewheiss/2024-11-13_udem-beyond-ols)
+
+format:
+  html:
+    theme:
+      - zephyr
+      - html/custom.scss
+    toc: false

@@ -1,0 +1,25 @@
+---
+title: Resources
+---
+
+### Bayesian modeling
+
+- [***Bayes Rules! An Introduction to Applied Bayesian Modeling***](https://www.bayesrulesbook.com/): This is the absolute best introductory textbook for Bayesian methods and multilevel models, and it's free! I've created [a notebook translating all its code to {brms} and raw Stan here](https://bayesf22-notebook.classes.andrewheiss.com/bayes-rules/).
+
+- The super canonical everyone-has-this-book book is [***Statistical Rethinking* by Richard McElreath**](https://xcelab.net/rm/statistical-rethinking/). At that page he also has an entire set of accompanying lectures on YouTube. He doesn't use {brms}, but Solomon Kurz has translated all his models to [tidyverse-based brms code here](https://bookdown.org/ajkurz/Statistical_Rethinking_recoded/).
+
+- [**Visualizing the differences between Bayesian posterior predictions, linear predictions, and the expectation of posterior predictions**](https://www.andrewheiss.com/blog/2022/09/26/guide-visualizing-types-posteriors/): A guide to different types of Bayesian posterior distributions and the nuances of `posterior_predict()`, `posterior_epred()`, and `posterior_linpred()`
+
+### Fancier regression
+
+- [**Poisson & Negative Bionomial Regression**](https://www.bayesrulesbook.com/chapter-12), chapter 12 in *Bayes Rules!*
+
+- [**A guide to modeling proportions with Bayesian beta and zero-inflated beta regression models**](https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/): A guide to Beta, zero-inflated Beta, one-inflated Beta, and zero-one-inflated Beta regression
+
+- [**Working with tricky outcomes with lots of zeros**](https://stats.andrewheiss.com/testy-turtle/notebook/model-tricky-outcomes.html): A notebook illustrating zero-inflated and hurdle models in practice
+
+### Marginal effects
+
+- [**{marginaleffects} documentation**](https://marginaleffects.com/): Incredible book-style documentation showing how the {marginaleffects} package works
+
+- [**Marginalia: A guide to figuring out what the heck marginal effects, marginal slopes, average marginal effects, marginal effects at the mean, and all these other marginal things are**](https://www.andrewheiss.com/blog/2022/05/20/marginalia/): Big practical guide to calculating different types of marginal effects

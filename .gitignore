@@ -1,0 +1,12 @@
+# R stuff
+.Rproj.user
+.Rhistory
+.RData
+
+.quarto
+
+_site/
+
+examples.zip
+
+/.quarto/

@@ -1,0 +1,287 @@
+---
+title: OLS
+---
+
+Typically when we use linear regression (or OLS) to model things in social science, we care about the coefficients so that we can find marginal effects: what happens to the outcome when we move an explanatory variable up and down? Or in the case of categorical explanatory variables, what's the average outcome across different categories?
+
+Because of this, we don't typically think about distributions or parameters when working with OLS. BUT WE CAN. And thinking about how outcome distributions change in response to explanatory variables opens up possibilities for modeling all sorts of speical non-normal outcomes.
+
+```{r}
+#| label: setup
+#| include: false
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.height = 6 * 0.618,
+  fig.retina = 3,
+  dev = "ragg_png",
+  fig.align = "center",
+  out.width = "95%",
+  warning = FALSE,
+  collapse = TRUE,
+  cache.extra = 1234  # Change number to invalidate cache
+)
+```
+
+```{r}
+#| label: packages-data
+#| warning: false
+#| message: false
+
+library(tidyverse)
+library(palmerpenguins)
+library(marginaleffects)
+library(patchwork)
+library(parameters)
+library(broom)
+library(distributional)
+library(ggdist)
+library(brms)
+library(tidybayes)
+
+options(mc.cores = 4)  # Use 4 cores for {brms}
+
+theme_set(theme_minimal())
+
+penguins <- penguins |> drop_na(sex)
+```
+
+For instance, we can model the distribution of penguin weights:
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+```
+
+That doesn't look very normal—it's skewed right with a long tail. That's likely because of other factors, like penguin species. Let's color by species:
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  geom_density()
+```
+
+That original lumpy skewed distribution is actually the combination of three separate relatively-normal-looking distributions.
+
+Let's model body mass based on species:
+
+```{r}
+model <- lm(body_mass_g ~ species, data = penguins)
+
+# parameters::model_parameters() gives a nice summary of the coefficients
+model_parameters(model)
+
+# So does broom::tidy()
+tidy(model, conf.int = TRUE)
+```
+
+Since these are all in grams, we can interpret these coefficients directly ([and we can think of them as sliders and switches](https://www.andrewheiss.com/blog/2022/05/20/marginalia/#regression-sliders-switches-and-mixing-boards))
+
+It's a little annoying to have all these estimates be based around Adelie. We can get around that in a couple ways:
+
+1. Use `marginaleffects::avg_predictions()`, which deals with all the relative group averages automatically:
+
+```{r, indent="   "}
+avg_predictions(model, variables = "species")
+```
+
+2. Fit a model without the intercept using `0 +`:
+
+```{r, indent="   "}
+model_sans_intercept <- lm(body_mass_g ~ 0 + species, data = penguins)
+tidy(model_sans_intercept, conf.int = TRUE)
+```
+
+These coefficients show us the averages for each species, or the $\mu$ in a normal distribution:
+
+```{r}
+species_averages <- avg_predictions(model, variables = "species")
+
+ggplot(penguins, aes(x = body_mass_g, fill = species)) +
+  stat_density(geom = "area", alpha = 0.6, position = position_identity()) +
+  geom_vline(data = species_averages, aes(xintercept = estimate, color = species))
+```
+
+## Getting closer to distributional regression
+
+We're halfway to describing the outcome using distributions—we just need to find the standard deviation for each group.
+
+It's tempting to use the standard error column in the model results, but that's wrong! That's the standard deviation of the coefficient, not the standard deviation for the group.
+
+One way to use the model results to find group-specific distributional standard deviations is to find the standard deviation of the residuals. We can use `broom::augment()` to add the fitted values and residuals to each row in the original data:
+
+```{r}
+fitted_values <- augment(model)
+fitted_values
+```
+
+We can then find the standard deviation of the `.resid` column:
+
+```{r}
+penguin_parameters <- fitted_values |> 
+  group_by(species) |> 
+  summarize(mu = mean(.fitted), sigma = sd(.resid))
+penguin_parameters
+```
+
+These values represent the $\mu$ and $\sigma$ for each of the species distributions. We can confirm it with a plot:
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g, fill = species)) +
+  stat_density(geom = "area", alpha = 0.6, position = position_identity()) +
+  stat_function(data = penguin_parameters, aes(x = NULL, y = NULL, color = species[1]),
+                fun = function(x, mu, sigma) dnorm(x, mean = mu, sd = sigma),
+                args = list(mu = penguin_parameters$mu[1], sigma = penguin_parameters$sigma[1]), size = 1) +
+  stat_function(data = penguin_parameters, aes(x = NULL, y = NULL, color = species[2]),
+                fun = function(x, mu, sigma) dnorm(x, mean = mu, sd = sigma),
+                args = list(mu = penguin_parameters$mu[2], sigma = penguin_parameters$sigma[2]), size = 1) +
+  stat_function(data = penguin_parameters, aes(x = NULL, y = NULL, color = species[3]),
+                fun = function(x, mu, sigma) dnorm(x, mean = mu, sd = sigma),
+                args = list(mu = penguin_parameters$mu[3], sigma = penguin_parameters$sigma[3]), size = 1)
+```
+
+↑ That's all super gross code though. Instead of adding `stat_function()` layers manually like that, we can use the [{distributional}](https://pkg.mitchelloharawild.com/distributional/) R package, which lets you work with distribution objects:
+
+```{r}
+penguin_parameters_dist <- penguin_parameters |> 
+  mutate(dist = dist_normal(mu = mu, sigma = sigma))
+penguin_parameters_dist
+```
+
+Plotting this is much easier with the [{ggdist}](https://mjskay.github.io/ggdist/) package:
+
+```{r}
+ggplot() +
+  stat_slabinterval(
+    data = penguin_parameters_dist,
+    aes(dist = dist, fill = species, y = 0),
+    alpha = 0.6
+  )
+```
+
+We can even combine these estimated density plots with the actual data densities with some minor tweaks to the function arguments (and adjusting the y-axis range):
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g, color = species)) +
+  stat_density(geom = "line", position = position_identity()) +
+  stat_slabinterval(
+    data = penguin_parameters_dist,
+    aes(dist = dist, fill = species, y = 0),
+    alpha = 0.4, normalize = "none", inherit.aes = FALSE
+  ) +
+  coord_cartesian(ylim = c(0, 0.0011))
+```
+
+## Explicit distributional regression with Bayesianism
+
+It's neat that we can get the $\mu$ and $\sigma$ out of a regular OLS regression model and think about the outcomes as distributions. We can also use continuous predictors to show how the $\mu$ and $\sigma$ change across different values of those predictors, but getting that information out of the results of `lm()` requires a bunch of work.
+
+Fortunately, Bayesian regression (with [the magical {brms} package](https://paulbuerkner.com/brms/)) lets us explicitly model both the $\mu$ and—optionally—the $\sigma$.
+
+$$
+\begin{aligned}
+\text{Penguin weight}_i &\sim \mathcal{N}(\mu_i, \sigma_i) \\
+\mu_i &= \beta_0 + \beta_{1 \dots 2}\ \text{Species}_i
+\end{aligned}
+$$
+
+```{r}
+model_bayes <- brm(
+  bf(body_mass_g ~ species),
+  data = penguins,
+  family = gaussian,
+  chains = 4, iter = 2000, seed = 1234,
+  file = "models/model_ols_bayes", refresh = 0
+)
+model_bayes
+```
+
+```{r}
+model_parameters(model_bayes, verbose = FALSE)
+```
+
+```{r}
+model_bayes |> 
+  gather_draws(`^b_.*`, regex = TRUE) |>
+  ggplot(aes(x = .value, fill = .variable)) +
+  stat_halfeye(normalize = "xy") +
+  labs(x = "Coefficient value", y = NULL) +
+  facet_wrap(vars(.variable), scales = "free_x") +
+  guides(fill = "none") +
+  theme(axis.text.y = element_blank())
+```
+
+```{r}
+plot_predictions_equal_variances <- model_bayes |> 
+  avg_predictions(variables = "species") |> 
+  posterior_draws() |> 
+  ggplot(aes(x = draw, fill = species)) +
+  stat_halfeye(normalize = "xy") +
+  labs(x = "Predicted value", y = NULL) +
+  facet_wrap(vars(species), scales = "free_x") +
+  guides(fill = "none") +
+  theme(axis.text.y = element_blank())
+plot_predictions_equal_variances
+```
+
+We can also explicitly model the $\sigma$ part of the outcome, and we can even model it differently from the $\mu$ part if we have reason to believe the process might be different. For simplicitly, we'll just use the same explanatory variables for both parts:
+
+$$
+\begin{aligned}
+\text{Penguin weight}_i &\sim \mathcal{N}(\mu_i, \sigma_i) \\
+\mu_i &= \beta_0 + \beta_{1 \dots 2}\ \text{Species}_i \\
+\log(\sigma_i) &= \gamma_0 + \gamma_{1 \dots 2}\ \text{Species}_i
+\end{aligned}
+$$
+
+```{r}
+model_bayes_sigma <- brm(
+  bf(
+    body_mass_g ~ species,
+    sigma ~ 0 + species
+  ),
+  data = penguins,
+  family = gaussian,
+  chains = 4, iter = 2000, seed = 1234,
+  file = "models/model_ols_sigma_bayes", refresh = 0
+)
+model_bayes_sigma
+```
+
+```{r}
+model_parameters(model_bayes_sigma, verbose = FALSE)
+```
+
+Now we have model parameters for the regular coefficients *and* the sigmas (prefixed with `sigma_`). For whatever reason, Stan works with these on the log scale, which is why they all look really tiny. We can unlog them by exponentiating them:
+
+```{r}
+model_parameters(
+  model_bayes_sigma, 
+  keep = "sigma_",
+  exponentiate = TRUE, 
+  verbose = FALSE
+)
+```
+
+They're the same as what we found earlier by calculating the standard deviation of the residuals!
+
+```{r}
+penguin_parameters
+```
+
+```{r}
+plot_predictions_different_variances <- model_bayes_sigma |> 
+  avg_predictions(variables = "species") |> 
+  posterior_draws() |> 
+  ggplot(aes(x = draw, fill = species)) +
+  stat_halfeye(normalize = "xy") +
+  labs(x = "Predicted value", y = NULL) +
+  facet_wrap(vars(species), scales = "free_x") +
+  guides(fill = "none") +
+  theme(axis.text.y = element_blank())
+plot_predictions_different_variances
+```
+
+```{r}
+(plot_predictions_equal_variances + labs("Same sigma")) /
+  (plot_predictions_different_variances + labs("Different sigmas"))
+```
