@@ -333,7 +333,7 @@ model_beta |>
 
 ## Bayesian Beta models
 
-We can run this model with Bayesian regression too. We'll set some weakly informative priors and define the model like this. If we had more data, we could also model the variance, or $\phi$, but we won't here.
+We can run this model with Bayesian regression too. We'll set some weakly informative priors and define the model like this. If we had more data, we could also model the variance, or $\phi$, but we won't here. ([Here's an example](https://www.andrewheiss.com/blog/2021/11/08/beta-regression-guide/#continuous-predictor) of modeling both the $\mu$ and the $\phi$)
 
 $$
 \begin{aligned}

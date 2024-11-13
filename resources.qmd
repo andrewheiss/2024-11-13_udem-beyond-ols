@@ -4,6 +4,8 @@ title: Resources
 
 ### Bayesian modeling
 
+- [**Super quick crash course explanation of frequentism vs. Bayesianism**](https://evalsp24.classes.andrewheiss.com/resource/bayes.html), including [this table](https://evalsp24.classes.andrewheiss.com/resource/bayes.html#general-summary-of-intervals) summarizing the two approaches' philosophies
+
 - [***Bayes Rules! An Introduction to Applied Bayesian Modeling***](https://www.bayesrulesbook.com/): This is the absolute best introductory textbook for Bayesian methods and multilevel models, and it's free! I've created [a notebook translating all its code to {brms} and raw Stan here](https://bayesf22-notebook.classes.andrewheiss.com/bayes-rules/).
 
 - The super canonical everyone-has-this-book book is [***Statistical Rethinking* by Richard McElreath**](https://xcelab.net/rm/statistical-rethinking/). At that page he also has an entire set of accompanying lectures on YouTube. He doesn't use {brms}, but Solomon Kurz has translated all his models to [tidyverse-based brms code here](https://bookdown.org/ajkurz/Statistical_Rethinking_recoded/).
