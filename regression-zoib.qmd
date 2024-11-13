@@ -264,4 +264,4 @@ Yeah, kind of! There's a newer family of model called "ordered beta regression" 
 Kubinec, Robert. 2022. “Ordered Beta Regression: A Parsimonious, Well-Fitting Model for Continuous Data with Lower and Upper Bounds.” *Political Analysis* 31, no. 4 (2023): 519–36. <https://doi.org/10.1017/pan.2022.20>.
 :::
 
-See an example of [ordered beta regression in action here](https://stats.andrewheiss.com/compassionate-clam/notebook/ordbeta.html) or [see the official tutorial here](https://cran.r-project.org/web/packages/ordbetareg/vignettes/package_introduction.html).
+See an example of [ordered beta regression in action here](https://stats.andrewheiss.com/compassionate-clam/notebook/ordbeta.html) or [here](https://dibsmethodsmeetings.github.io/ordered-beta/) or [see the official tutorial here](https://cran.r-project.org/web/packages/ordbetareg/vignettes/package_introduction.html).
